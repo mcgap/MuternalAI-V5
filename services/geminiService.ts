@@ -1,88 +1,22 @@
-import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { Opportunity } from "../types";
 
-const SYSTEM_INSTRUCTION = `
-You are MuternalAI, a Startup Validation & Execution Engine.
-Your goal is to validate high-leverage startup opportunities by analyzing demand proof.
-
-VALIDATION SOURCES:
-1. Google Trends -> Demand Strength (Search momentum).
-2. Reddit -> Pain Proof (Complaint frequency & intensity).
-3. Twitter (X) -> Momentum Proof (Engagement spikes).
-4. Product Hunt -> Competition Proof (Competitor count).
-
-You must generate strictly numeric strength scores (0-10) for these dimensions based on startup gap analysis.
-`;
-
 export const generateOpportunities = async (niche: string = "General"): Promise<Opportunity[]> => {
-  if (!process.env.API_KEY) {
-    throw new Error("API Key is missing");
-  }
-
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
-  const prompt = `
-    Discover startup gaps for: "${niche}" using search to find validation proof (last 90 days).
-
-    Identify top 10 Validated Startup Ideas.
-    
-    For each opportunity, provide:
-    1. Opportunity Name & Target User.
-    2. Dominant Pain: A specific problem statement found in user communities.
-    3. Proof Strength (0-10):
-       - Demand Score: Based on Google Trends search volume/growth.
-       - Pain Score: Based on Reddit complaint severity.
-       - Momentum Score: Based on velocity.
-       - Saturation Score: Based on competitor density.
-    4. Metrics:
-       - Demand Growth: String (e.g. "+145%").
-       - Reddit Complaints: Estimated count.
-       - Twitter Mentions: Estimated count.
-       - Competitor Count: Count of direct rivals.
-    5. Demand Distribution:
-       - Identify 3-5 global regions where interest is highest.
-       - Provide approximate Latitude/Longitude.
-       - Assign an intensity (1-10) for the distribution.
-
-    Return the data strictly as a raw JSON array of objects without any markdown formatting like \`\`\`json. The objects must have these exact keys:
-    "opportunity_name", "target_user", "dominant_pain", "pain_score", "demand_score", "momentum_score", "supply_score", "demand_growth", "reddit_complaints", "twitter_mentions", "competitor_count", "build_recommendation", "demand_locations" (array of objects with "city", "country", "lat", "lng", "intensity").
-  `;
-
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-      config: {
-        tools: [{ googleSearch: {} }], 
-        systemInstruction: SYSTEM_INSTRUCTION,
-        temperature: 0.7,
+    const response = await fetch('/api/opportunities', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({ niche }),
     });
 
-    let text = response.text;
-    if (!text) return [];
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      throw new Error(errorData?.error || `HTTP error! status: ${response.status}`);
+    }
 
-    // Clean up potential markdown formatting
-    text = text.replace(/^```json\s*/, '').replace(/\s*```$/, '').trim();
-
-    const data = JSON.parse(text) as Omit<Opportunity, 'opportunity_score'>[];
-    
-    return data.map(opp => {
-      const demandWeighted = opp.demand_score * 0.35;
-      const painWeighted = opp.pain_score * 0.25;
-      const momentumWeighted = opp.momentum_score * 0.25;
-      const saturationPenalty = opp.supply_score * 0.15;
-      
-      const rawScore = (demandWeighted + painWeighted + momentumWeighted) - saturationPenalty;
-      let finalScore = Math.round(rawScore * 10);
-      finalScore = Math.max(0, Math.min(100, finalScore));
-
-      return {
-        ...opp,
-        opportunity_score: finalScore
-      };
-    }).sort((a, b) => b.opportunity_score - a.opportunity_score);
-
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error("Discovery Failed:", error);
     throw error;

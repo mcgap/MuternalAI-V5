@@ -10,8 +10,18 @@ const HeatMap: React.FC<Props> = ({ locations }) => {
   const mapHeight = 400;
 
   const getXY = (lat: number, lng: number) => {
+    // The SVG map is an equirectangular projection, but the bounding box might not be exactly -180 to 180 and -90 to 90.
+    // Adjusting the scaling slightly to better fit the specific SVG used.
+    // The SVG map from Wikipedia is not a perfect equirectangular projection from -90 to 90.
+    // It cuts off Antarctica and some northern parts.
+    // Let's adjust the bounds. The map roughly covers lat 85 to -60.
+    const mapLatTop = 85;
+    const mapLatBottom = -60;
+    const latRange = mapLatTop - mapLatBottom;
+    
     const x = (lng + 180) * (mapWidth / 360);
-    const y = ((-1 * lat) + 90) * (mapHeight / 180);
+    const y = (mapLatTop - lat) * (mapHeight / latRange);
+    
     return { x, y };
   };
 

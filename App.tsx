@@ -141,7 +141,7 @@ const App: React.FC = () => {
         setLastSyncTime(new Date());
       } catch (err) {
         setAppState(AppState.ERROR);
-        setError("Startup intelligence feed interrupted. Please check your API Key configuration.");
+        setError(err instanceof Error ? err.message : "Startup intelligence feed interrupted. Please check your API Key configuration.");
       }
     }, 2500);
   };
