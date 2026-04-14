@@ -44,64 +44,26 @@ export const generateOpportunities = async (niche: string = "General"): Promise<
        - Provide approximate Latitude/Longitude.
        - Assign an intensity (1-10) for the distribution.
 
-    Return the data strictly as a JSON array.
+    Return the data strictly as a raw JSON array of objects without any markdown formatting like \`\`\`json. The objects must have these exact keys:
+    "opportunity_name", "target_user", "dominant_pain", "pain_score", "demand_score", "momentum_score", "supply_score", "demand_growth", "reddit_complaints", "twitter_mentions", "competitor_count", "build_recommendation", "demand_locations" (array of objects with "city", "country", "lat", "lng", "intensity").
   `;
-
-  const opportunitySchema: Schema = {
-    type: Type.ARRAY,
-    items: {
-      type: Type.OBJECT,
-      properties: {
-        opportunity_name: { type: Type.STRING },
-        target_user: { type: Type.STRING },
-        dominant_pain: { type: Type.STRING },
-        pain_score: { type: Type.NUMBER },
-        demand_score: { type: Type.NUMBER },
-        momentum_score: { type: Type.NUMBER },
-        supply_score: { type: Type.NUMBER },
-        demand_growth: { type: Type.STRING },
-        reddit_complaints: { type: Type.NUMBER },
-        twitter_mentions: { type: Type.NUMBER },
-        competitor_count: { type: Type.NUMBER },
-        build_recommendation: { type: Type.STRING },
-        demand_locations: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              city: { type: Type.STRING },
-              country: { type: Type.STRING },
-              lat: { type: Type.NUMBER },
-              lng: { type: Type.NUMBER },
-              intensity: { type: Type.NUMBER }
-            }
-          }
-        }
-      },
-      required: [
-        "opportunity_name", "target_user", "dominant_pain", 
-        "pain_score", "demand_score", "momentum_score", "supply_score",
-        "demand_growth", "reddit_complaints", "twitter_mentions", "competitor_count",
-        "build_recommendation", "demand_locations"
-      ],
-    },
-  };
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.5-flash",
       contents: prompt,
       config: {
         tools: [{ googleSearch: {} }], 
         systemInstruction: SYSTEM_INSTRUCTION,
-        responseMimeType: "application/json",
-        responseSchema: opportunitySchema,
         temperature: 0.7,
       },
     });
 
-    const text = response.text;
+    let text = response.text;
     if (!text) return [];
+
+    // Clean up potential markdown formatting
+    text = text.replace(/^```json\s*/, '').replace(/\s*```$/, '').trim();
 
     const data = JSON.parse(text) as Omit<Opportunity, 'opportunity_score'>[];
     

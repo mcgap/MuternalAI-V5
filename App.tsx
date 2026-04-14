@@ -31,183 +31,6 @@ import SignalStream from './components/SignalStream';
 import ScoreBadge from './components/ScoreBadge';
 import HeatMap from './components/HeatMap';
 
-const MOCK_OPPORTUNITIES: Opportunity[] = [
-  {
-    opportunity_name: "AI Legal Automation",
-    target_user: "Small Law Firms",
-    pain_score: 9,
-    demand_score: 8,
-    momentum_score: 7,
-    supply_score: 3,
-    opportunity_score: 79, 
-    dominant_pain: "Manual contract review costs $200/hr + high error risk",
-    demand_growth: "+132%",
-    reddit_complaints: 67,
-    twitter_mentions: 1240,
-    competitor_count: 5,
-    build_recommendation: "Automate contract review and clause extraction specifically for boutique firms who cannot afford enterprise tools.",
-    demand_locations: [
-      { city: "New York", country: "USA", lat: 40.7128, lng: -74.0060, intensity: 9 },
-      { city: "London", country: "UK", lat: 51.5074, lng: -0.1278, intensity: 8 },
-      { city: "Toronto", country: "Canada", lat: 43.6532, lng: -79.3832, intensity: 7 }
-    ]
-  },
-  {
-    opportunity_name: "Vertical SaaS CRM for Plumbers",
-    target_user: "Plumbing Businesses",
-    pain_score: 8,
-    demand_score: 7,
-    momentum_score: 5,
-    supply_score: 2,
-    opportunity_score: 74,
-    dominant_pain: "Generic CRMs are too complex and lack dispatch features",
-    demand_growth: "+85%",
-    reddit_complaints: 42,
-    twitter_mentions: 150,
-    competitor_count: 3,
-    build_recommendation: "Mobile-first CRM with offline mode and automated dispatching.",
-    demand_locations: [
-        { city: "Dallas", country: "USA", lat: 32.7767, lng: -96.7970, intensity: 8 },
-        { city: "Phoenix", country: "USA", lat: 33.4484, lng: -112.0740, intensity: 7 }
-    ]
-  },
-  {
-    opportunity_name: "AI Grant Writer for Non-Profits",
-    target_user: "Non-Profit Directors",
-    pain_score: 9,
-    demand_score: 6,
-    momentum_score: 6,
-    supply_score: 3,
-    opportunity_score: 72,
-    dominant_pain: "Writing grants takes 40+ hours with low success rate",
-    demand_growth: "+60%",
-    reddit_complaints: 89,
-    twitter_mentions: 340,
-    competitor_count: 4,
-    build_recommendation: "Fine-tune LLM on successful grant applications for specific sectors.",
-    demand_locations: [
-          { city: "Washington", country: "USA", lat: 38.9072, lng: -77.0369, intensity: 9 },
-          { city: "Brussels", country: "Belgium", lat: 50.8503, lng: 4.3517, intensity: 7 }
-    ]
-  },
-  {
-    opportunity_name: "E-commerce Returns Optimizer",
-    target_user: "Shopify Store Owners",
-    pain_score: 7,
-    demand_score: 9,
-    momentum_score: 8,
-    supply_score: 6,
-    opportunity_score: 70,
-    dominant_pain: "Returns are eating 20% of profit margins",
-    demand_growth: "+110%",
-    reddit_complaints: 210,
-    twitter_mentions: 890,
-    competitor_count: 12,
-    build_recommendation: "Predict high-risk returns before checkout using behavioral analysis.",
-    demand_locations: [
-        { city: "Los Angeles", country: "USA", lat: 34.0522, lng: -118.2437, intensity: 9 },
-        { city: "Shenzhen", country: "China", lat: 22.5431, lng: 114.0579, intensity: 8 }
-    ]
-  },
-  {
-    opportunity_name: "AI Procurement Negotiator",
-    target_user: "SME Operations Managers",
-    pain_score: 8,
-    demand_score: 5,
-    momentum_score: 4,
-    supply_score: 2,
-    opportunity_score: 69,
-    dominant_pain: "Overpaying for vendor supplies due to lack of negotiation time",
-    demand_growth: "+35%",
-    reddit_complaints: 28,
-    twitter_mentions: 90,
-    competitor_count: 2,
-    build_recommendation: "Email bot that auto-negotiates renewal contracts with vendors.",
-    demand_locations: [
-        { city: "Chicago", country: "USA", lat: 41.8781, lng: -87.6298, intensity: 7 },
-        { city: "Frankfurt", country: "Germany", lat: 50.1109, lng: 8.6821, intensity: 6 }
-    ]
-  },
-  {
-    opportunity_name: "AI Video Editing for Reels",
-    target_user: "Content Creators",
-    pain_score: 8,
-    demand_score: 10,
-    momentum_score: 9,
-    supply_score: 8,
-    opportunity_score: 68,
-    dominant_pain: "Hours spent editing subtitles and jump-cuts for 30s clips",
-    demand_growth: "+210%",
-    reddit_complaints: 145,
-    twitter_mentions: 5400,
-    competitor_count: 22,
-    build_recommendation: "Auto-captioning is saturated. Focus on 'retention editing'—AI that suggests visual hooks.",
-    demand_locations: [
-      { city: "Los Angeles", country: "USA", lat: 34.0522, lng: -118.2437, intensity: 10 },
-      { city: "Austin", country: "USA", lat: 30.2672, lng: -97.7431, intensity: 8 },
-      { city: "Berlin", country: "Germany", lat: 52.5200, lng: 13.4050, intensity: 7 }
-    ]
-  },
-  {
-    opportunity_name: "Automated Code Documentation",
-    target_user: "Dev Agencies",
-    pain_score: 6,
-    demand_score: 8,
-    momentum_score: 7,
-    supply_score: 5,
-    opportunity_score: 66,
-    dominant_pain: "Legacy codebases are undocumented and hard to hand off",
-    demand_growth: "+95%",
-    reddit_complaints: 156,
-    twitter_mentions: 1100,
-    competitor_count: 9,
-    build_recommendation: "Generate visual system architecture diagrams from repo URL.",
-    demand_locations: [
-        { city: "San Francisco", country: "USA", lat: 37.7749, lng: -122.4194, intensity: 10 },
-        { city: "Bangalore", country: "India", lat: 12.9716, lng: 77.5946, intensity: 9 }
-    ]
-  },
-  {
-    opportunity_name: "AI Local SEO Assistant",
-    target_user: "Small Business Owners",
-    pain_score: 7,
-    demand_score: 8,
-    momentum_score: 6,
-    supply_score: 4,
-    opportunity_score: 65,
-    dominant_pain: "Ignoring Google Reviews leads to revenue drop",
-    demand_growth: "+45%",
-    reddit_complaints: 34,
-    twitter_mentions: 210,
-    competitor_count: 8,
-    build_recommendation: "Focus on Google Business Profile auto-updates and review response automation.",
-    demand_locations: [
-      { city: "Chicago", country: "USA", lat: 41.8781, lng: -87.6298, intensity: 8 },
-      { city: "Miami", country: "USA", lat: 25.7617, lng: -80.1918, intensity: 7 },
-      { city: "Sydney", country: "Australia", lat: -33.8688, lng: 151.2093, intensity: 6 }
-    ]
-  },
-  {
-    opportunity_name: "Personalized Study Plan AI",
-    target_user: "University Students",
-    pain_score: 9,
-    demand_score: 9,
-    momentum_score: 8,
-    supply_score: 7,
-    opportunity_score: 64,
-    dominant_pain: "Overwhelmed by syllabus and procrastination",
-    demand_growth: "+180%",
-    reddit_complaints: 450,
-    twitter_mentions: 3200,
-    competitor_count: 15,
-    build_recommendation: "Dynamic calendar that adapts to student's energy levels and grades.",
-    demand_locations: [
-        { city: "Boston", country: "USA", lat: 42.3601, lng: -71.0589, intensity: 9 },
-        { city: "Seoul", country: "South Korea", lat: 37.5665, lng: 126.9780, intensity: 9 }
-    ]
-  }
-];
-
 const getBlueprint = (opp: Opportunity) => {
   const name = opp.opportunity_name.toLowerCase();
   const isLegal = name.includes("legal") || name.includes("compliance") || name.includes("procurement");
@@ -284,7 +107,7 @@ const getBlueprint = (opp: Opportunity) => {
 const App: React.FC = () => {
   const [niche, setNiche] = useState('');
   const [appState, setAppState] = useState<AppState>(AppState.COMPLETE);
-  const [opportunities, setOpportunities] = useState<Opportunity[]>(MOCK_OPPORTUNITIES);
+  const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [selectedOpp, setSelectedOpp] = useState<Opportunity | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -295,6 +118,7 @@ const App: React.FC = () => {
   const dashboardScrollRef = useRef<HTMLDivElement>(null);
   const signalsScrollRef = useRef<HTMLDivElement>(null);
   const builderScrollRef = useRef<HTMLDivElement>(null);
+  const initialFetchDone = useRef(false);
 
   useEffect(() => {
     setCopiedPrompt(false);
@@ -323,8 +147,15 @@ const App: React.FC = () => {
   };
 
   const handleGlobalScan = () => {
-    executeMarketAnalysis("High Growth SaaS Opportunities");
+    executeMarketAnalysis("Trending high pain startup ideas");
   };
+
+  useEffect(() => {
+    if (!initialFetchDone.current) {
+      initialFetchDone.current = true;
+      executeMarketAnalysis("Trending high pain startup ideas");
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -578,6 +409,20 @@ Please create a project structure and the initial configuration files.`;
             {(appState === AppState.SCANNING || appState === AppState.ANALYZING) && (
               <div className="mb-8 rounded-xl overflow-hidden border border-brand-500/20 shadow-[0_0_50px_rgba(20,184,166,0.1)]">
                 <SignalStream active={true} />
+              </div>
+            )}
+
+            {appState === AppState.ERROR && error && (
+              <div className="mb-8 p-6 rounded-xl border border-red-500/30 bg-red-500/10 text-center animate-fade-in-up">
+                <AlertCircle size={32} className="mx-auto mb-3 text-red-400" />
+                <h3 className="text-lg font-bold text-red-400 mb-2">Analysis Interrupted</h3>
+                <p className="text-red-300/80 text-sm">{error}</p>
+                <button 
+                  onClick={handleGlobalScan}
+                  className="mt-4 px-6 py-2 bg-red-500/20 text-red-300 hover:bg-red-500/30 rounded-full text-sm font-medium transition-colors"
+                >
+                  Try Again
+                </button>
               </div>
             )}
 
