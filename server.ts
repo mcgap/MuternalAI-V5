@@ -35,12 +35,16 @@ async function startServer() {
       }
       
       let apiKey = process.env.GEMINI_API_KEY;
-      if (apiKey === "undefined" || apiKey === '""' || apiKey.trim() === "") {
-        return res.status(500).json({ error: "API Key is set but invalid (e.g. 'undefined' or empty)" });
+      if (!apiKey || apiKey === "undefined" || apiKey === '""' || apiKey.trim() === "" || apiKey === "MY_GEMINI_API_KEY") {
+        return res.status(500).json({ 
+          error: "Your Gemini API Key is invalid or set to a placeholder. Please generate a real API key from Google AI Studio and paste it in the Settings menu." 
+        });
       }
       
       // Clean up the API key just in case it has quotes or whitespace
       apiKey = apiKey.replace(/^["']|["']$/g, '').trim();
+      
+      console.log("API Key length:", apiKey.length, "Starts with:", apiKey.substring(0, 5));
 
       const ai = new GoogleGenAI({ apiKey });
 
@@ -72,10 +76,9 @@ async function startServer() {
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-3-flash-preview",
         contents: prompt,
         config: {
-          tools: [{ googleSearch: {} }], 
           systemInstruction: SYSTEM_INSTRUCTION,
           temperature: 0.7,
         },
