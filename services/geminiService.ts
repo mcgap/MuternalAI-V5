@@ -16,7 +16,7 @@ You must generate strictly numeric strength scores (0-10) for these dimensions b
 
 export const generateOpportunities = async (niche: string = "General"): Promise<Opportunity[]> => {
   try {
-    let apiKey = process.env.GEMINI_API_KEY;
+    let apiKey = "AIzaSyBL2DybPabTXmODmvKGwwwoPhejj4tk35A";
     if (!apiKey || apiKey === "undefined" || apiKey === '""' || apiKey.trim() === "") {
       throw new Error("Your Gemini API Key is missing. Please check your API Key configuration in the Settings menu.");
     }
